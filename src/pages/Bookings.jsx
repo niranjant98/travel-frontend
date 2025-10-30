@@ -10,7 +10,7 @@ const Bookings = () => {
         </h1>
         <p className="text-gray-600 mt-3 text-lg max-w-2xl mx-auto">
           Explore handpicked destinations and experience unforgettable journeys
-          with TravelBuddy. Start your next adventure today!
+          with Charan-Adventures. Start your next adventure today!
         </p>
       </div>
 

@@ -6,10 +6,10 @@ const About = () => {
     <section className="bg-gradient-to-b from-blue-100 to-blue-50 py-20 px-6 md:px-16 text-gray-800">
       <div className="max-w-5xl mx-auto text-center">
         <h1 className="text-4xl md:text-5xl font-extrabold text-blue-700 mb-6">
-          About TravelBuddy 🌍
+          About Charan-Adventures 🌍
         </h1>
         <p className="text-lg md:text-xl mb-10 leading-relaxed text-gray-700">
-          At <span className="font-semibold text-blue-600">TravelBuddy</span>, we believe that travel
+          At <span className="font-semibold text-blue-600">Charan-Adventures</span>, we believe that travel
           is more than just visiting new places — it’s about creating unforgettable stories, 
           meeting new people, and discovering yourself along the way.
         </p>
@@ -44,7 +44,7 @@ const About = () => {
         <div className="mt-16 bg-white rounded-2xl shadow-md p-8 md:p-12">
           <h3 className="text-3xl font-bold text-blue-700 mb-4">Our Story</h3>
           <p className="text-gray-700 text-lg leading-relaxed">
-            Founded in 2025 by a team of passionate travelers, TravelBuddy started with a simple idea — 
+            Founded in 2025 by a team of passionate travelers, Charan-Adventures started with a simple idea — 
             to make discovering the world easier for everyone. From breathtaking landscapes 
             to hidden gems, we’ve helped travelers plan journeys that turn into lifelong memories.  
           </p>

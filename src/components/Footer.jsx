@@ -7,7 +7,7 @@ const Footer = () => {
       <div className="max-w-6xl mx-auto px-6 flex flex-col md:flex-row justify-between items-center text-center md:text-left">
         {/* Brand Section */}
         <div className="mb-4 md:mb-0">
-          <h2 className="text-2xl font-bold text-blue-700">TravelBuddy ✈️</h2>
+          <h2 className="text-2xl font-bold text-blue-700">Charan-Adventures ✈️</h2>
           <p className="text-gray-600 mt-2">
             Explore the world with comfort and confidence.
           </p>

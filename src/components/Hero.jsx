@@ -25,7 +25,7 @@ const Hero = () => {
 
         <p className="text-sm sm:text-lg mb-6 font-light text-gray-200 leading-relaxed px-2 sm:px-0">
           Explore breathtaking destinations, unique experiences, and unforgettable memories — all
-          with <span className="font-semibold text-blue-300">TravelBuddy</span>.
+          with <span className="font-semibold text-blue-300">Charan-Adventures</span>.
         </p>
 
         <button
