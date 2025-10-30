@@ -38,7 +38,7 @@ const Footer = () => {
 
       {/* Bottom Line */}
       <div className="border-t border-gray-300 mt-6 pt-4 text-center text-gray-600 text-sm">
-        © {new Date().getFullYear()} TravelBuddy. All rights reserved.
+        © {new Date().getFullYear()} Charan-Adventures. All rights reserved.
       </div>
     </footer>
   );
