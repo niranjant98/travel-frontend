@@ -298,17 +298,28 @@ const Bookings = () => {
             </p>
           )}
 
-          {/* Travel Date */}
-          <div className="w-full">
-            <input
-              type="date"
-              name="travelDate"
-              value={formData.travelDate}
-              onChange={handleChange}
-              required
-              className="w-full border border-gray-300 rounded-lg p-3 text-sm sm:text-base"
-            />
-          </div>
+         {/* Travel Date */}
+<div className="w-full">
+  <label className="block text-gray-700 font-medium mb-2 text-sm sm:text-base">
+    Travel Date:
+  </label>
+  <input
+    type="date"
+    name="travelDate"
+    value={formData.travelDate}
+    onChange={handleChange}
+    required
+    className="w-full border border-gray-300 rounded-lg px-3 py-3 text-sm sm:text-base appearance-none focus:ring-2 focus:ring-blue-500 focus:outline-none"
+    style={{
+      WebkitAppearance: "none",
+      MozAppearance: "none",
+      appearance: "none",
+      backgroundColor: "#fff",
+      colorScheme: "light",
+    }}
+  />
+</div>
+
 
           {/* Phone */}
           <input
