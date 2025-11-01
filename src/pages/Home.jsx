@@ -12,7 +12,7 @@ const Home = () => {
       title: "Explore Bali",
       image: baliImg,
       duration: "7 Days / 6 Nights",
-      price: "₹55,000",
+      price: "₹10000",
       description: "Discover temples, beaches & tropical vibes.",
     },
     {
@@ -20,7 +20,7 @@ const Home = () => {
       title: "Paris Highlights",
       image: parisImg,
       duration: "5 Days / 4 Nights",
-      price: "₹80,000",
+      price: "₹20,000",
       description: "Romantic escapes and stunning architecture.",
     },
     {
@@ -28,7 +28,7 @@ const Home = () => {
       title: "New York Getaway",
       image: newYorkImg,
       duration: "6 Days / 5 Nights",
-      price: "₹95,000",
+      price: "₹25,000",
       description: "City lights, landmarks & endless energy.",
     },
   ];

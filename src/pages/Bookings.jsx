@@ -1,124 +1,358 @@
-import React from "react";
+import React, { useState } from "react";
+import axios from "axios";
 
 const Bookings = () => {
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    destination: "",
+    message: "",
+    travelDate: "",
+    members: 1,
+    phone: "",
+  });
+
+  const [otp, setOtp] = useState("");
+  const [otpSent, setOtpSent] = useState(false);
+  const [otpVerified, setOtpVerified] = useState(false);
+  const [loading, setLoading] = useState(false);
+
+  const backendURL =
+    process.env.REACT_APP_BACKEND_URL || "http://localhost:5000";
+  const razorpayKey = process.env.REACT_APP_RAZORPAY_KEY_ID;
+
+  // 💰 Destination Prices
+  const destinationPrices = {
+    Bali: 10000,
+    Paris: 20000,
+    "New York": 25000,
+  };
+
+  // 🧮 Compute total dynamically
+  const basePrice = destinationPrices[formData.destination] || 0;
+  const totalAmount = basePrice * formData.members;
+
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  // ➕ Increase members
+  const increaseMembers = () => {
+    setFormData((prev) => ({ ...prev, members: prev.members + 1 }));
+  };
+
+  // ➖ Decrease members (min 1)
+  const decreaseMembers = () => {
+    setFormData((prev) => ({
+      ...prev,
+      members: prev.members > 1 ? prev.members - 1 : 1,
+    }));
+  };
+
+  // ✅ Send OTP
+  const sendOtp = async () => {
+    if (!formData.email) return alert("Please enter your email first!");
+    try {
+      const res = await axios.post(`${backendURL}/api/otp/send`, {
+        email: formData.email,
+      });
+      if (res.data.success) {
+        alert("✅ OTP sent to your email!");
+        setOtpSent(true);
+      } else {
+        alert("❌ Failed to send OTP!");
+      }
+    } catch (error) {
+      console.error("OTP Error:", error);
+      alert("❌ Failed to send OTP!");
+    }
+  };
+
+  // ✅ Verify OTP
+  const verifyOtp = async () => {
+    if (!otp) return alert("Enter the OTP sent to your email!");
+    try {
+      const res = await axios.post(`${backendURL}/api/otp/verify`, {
+        email: formData.email,
+        otp,
+      });
+      if (res.data.success) {
+        alert("✅ OTP verified successfully!");
+        setOtpVerified(true);
+      } else {
+        alert("❌ Invalid OTP. Try again.");
+      }
+    } catch (error) {
+      console.error("Verify OTP Error:", error);
+      alert("Error verifying OTP!");
+    }
+  };
+
+  // ✅ Payment Handler
+  const handlePayment = async () => {
+    try {
+      setLoading(true);
+
+      const amount = totalAmount; // total = basePrice × members
+
+      // 1️⃣ Create Razorpay order
+      const { data } = await axios.post(`${backendURL}/api/payment/create-order`, {
+        amount,
+      });
+
+      if (!data.success) {
+        alert("Failed to create payment order!");
+        return;
+      }
+
+      const { id: order_id, currency } = data.order;
+
+      // 2️⃣ Razorpay Payment Options
+      const options = {
+        key: razorpayKey,
+        amount: amount * 100, // Razorpay uses paise
+        currency,
+        name: "Charan Adventures",
+        description: `Booking for ${formData.destination}`,
+        order_id,
+        handler: async function (response) {
+          alert("✅ Payment Successful!");
+
+          try {
+            await axios.post(`${backendURL}/api/bookings/add`, {
+              ...formData,
+              amount,
+              razorpayOrderId: response.razorpay_order_id,
+              razorpayPaymentId: response.razorpay_payment_id,
+              razorpaySignature: response.razorpay_signature,
+            });
+
+            alert("✅ Booking confirmed! Confirmation email sent.");
+
+            // Reset form
+            setFormData({
+              name: "",
+              email: "",
+              destination: "",
+              message: "",
+              travelDate: "",
+              members: 1,
+              phone: "",
+            });
+            setOtp("");
+            setOtpSent(false);
+            setOtpVerified(false);
+          } catch (err) {
+            console.error("Booking Save Error:", err);
+            alert("❌ Booking save failed but payment succeeded.");
+          }
+        },
+        prefill: {
+          name: formData.name,
+          email: formData.email,
+          contact: formData.phone,
+        },
+        theme: {
+          color: "#2563eb",
+        },
+        modal: {
+          ondismiss: () => {
+            alert("Payment cancelled.");
+          },
+        },
+      };
+
+      const razor = new window.Razorpay(options);
+      razor.open();
+
+      // Payment failure
+      razor.on("payment.failed", function (response) {
+        alert("❌ Payment failed. Please try again.");
+        console.error(response.error);
+      });
+    } catch (error) {
+      console.error("❌ Payment Error:", error);
+      alert("Something went wrong during payment!");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // ✅ Submit Form
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    if (!otpVerified) {
+      alert("Please verify your email before payment!");
+      return;
+    }
+    if (!formData.destination) {
+      alert("Please select a destination!");
+      return;
+    }
+    handlePayment();
+  };
+
   return (
     <section className="bg-blue-50 py-16 px-6 md:px-20">
-      {/* Header Section */}
       <div className="text-center mb-12">
         <h1 className="text-4xl md:text-5xl font-extrabold text-blue-700">
           Book Your Dream Adventure 🌍
         </h1>
         <p className="text-gray-600 mt-3 text-lg max-w-2xl mx-auto">
-          Explore handpicked destinations and experience unforgettable journeys
-          with Charan-Adventures. Start your next adventure today!
+          Explore amazing destinations with Charan Adventures. Start your journey now!
         </p>
       </div>
 
-      {/* Featured Packages */}
-      <div className="grid md:grid-cols-3 gap-10 mb-16">
-        {/* Paris */}
-        <div className="bg-white rounded-2xl shadow-md overflow-hidden hover:shadow-xl transition">
-          <img
-            src="https://images.unsplash.com/photo-1502602898657-3e91760cbb34?w=800"
-            alt="Paris"
-            className="w-full h-56 object-cover"
-          />
-          <div className="p-6">
-            <h3 className="text-2xl font-bold text-blue-700 mb-2">Paris, France 🇫🇷</h3>
-            <p className="text-gray-600 mb-4">
-              Experience the city of lights, romance, and art. Visit the Eiffel Tower and enjoy fine dining by the Seine.
-            </p>
-            <p className="font-semibold text-blue-600">Starting from ₹80000</p>
-          </div>
-        </div>
-
-        {/* Bali */}
-        <div className="bg-white rounded-2xl shadow-md overflow-hidden hover:shadow-xl transition">
-          <img
-            src="https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=800"
-            alt="Bali"
-            className="w-full h-56 object-cover"
-          />
-          <div className="p-6">
-            <h3 className="text-2xl font-bold text-blue-700 mb-2">Bali, Indonesia 🌴</h3>
-            <p className="text-gray-600 mb-4">
-              Relax on sun-kissed beaches, explore lush forests, and enjoy a perfect tropical retreat.
-            </p>
-            <p className="font-semibold text-blue-600">Starting from ₹55000</p>
-          </div>
-        </div>
-
-        {/* New York */}
-        <div className="bg-white rounded-2xl shadow-md overflow-hidden hover:shadow-xl transition">
-          <img
-            src="https://images.unsplash.com/photo-1533106418989-88406c7cc8ca?w=800"
-            alt="New York"
-            className="w-full h-56 object-cover"
-          />
-          <div className="p-6">
-            <h3 className="text-2xl font-bold text-blue-700 mb-2">New York, USA 🗽</h3>
-            <p className="text-gray-600 mb-4">
-              Feel the pulse of the Big Apple. From Times Square to Central Park, the city never sleeps!
-            </p>
-            <p className="font-semibold text-blue-600">Starting from ₹95000</p>
-          </div>
-        </div>
-      </div>
-
-      {/* Booking Form */}
       <div className="max-w-3xl mx-auto bg-white shadow-md rounded-2xl p-8 md:p-12">
         <h2 className="text-3xl font-bold text-blue-700 mb-6 text-center">
-          Enquire or Book Now 🧾
+          Booking Form 🧾
         </h2>
-        <form className="space-y-6">
+
+        <form className="space-y-6" onSubmit={handleSubmit}>
+          {/* Name */}
+          <input
+            type="text"
+            name="name"
+            placeholder="Full Name"
+            value={formData.name}
+            onChange={handleChange}
+            required
+            className="w-full border border-gray-300 rounded-lg p-3"
+          />
+
+          {/* Email + OTP */}
           <div>
-            <label className="block text-gray-700 font-medium mb-2">
-              Full Name
-            </label>
-            <input
-              type="text"
-              placeholder="Enter your name"
-              className="w-full border border-gray-300 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-blue-400"
-            />
+            <div className="flex gap-3">
+              <input
+                type="email"
+                name="email"
+                placeholder="Email Address"
+                value={formData.email}
+                onChange={handleChange}
+                required
+                className="flex-1 border border-gray-300 rounded-lg p-3"
+              />
+              <button
+                type="button"
+                onClick={sendOtp}
+                className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
+              >
+                Send OTP
+              </button>
+            </div>
+
+            {otpSent && !otpVerified && (
+              <div className="flex gap-3 mt-3">
+                <input
+                  type="text"
+                  placeholder="Enter OTP"
+                  value={otp}
+                  onChange={(e) => setOtp(e.target.value)}
+                  className="flex-1 border border-gray-300 rounded-lg p-3"
+                />
+                <button
+                  type="button"
+                  onClick={verifyOtp}
+                  className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700"
+                >
+                  Verify
+                </button>
+              </div>
+            )}
+
+            {otpVerified && (
+              <p className="text-green-600 mt-2 font-semibold">✅ Email Verified!</p>
+            )}
           </div>
-          <div>
-            <label className="block text-gray-700 font-medium mb-2">
-              Email Address
-            </label>
-            <input
-              type="email"
-              placeholder="Enter your email"
-              className="w-full border border-gray-300 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-blue-400"
-            />
+
+          {/* Destination */}
+          <select
+            name="destination"
+            value={formData.destination}
+            onChange={handleChange}
+            required
+            className="w-full border border-gray-300 rounded-lg p-3"
+          >
+            <option value="">Select Destination</option>
+            <option>Bali</option>
+            <option>Paris</option>
+            <option>New York</option>
+          </select>
+
+          {/* Members with + and - buttons */}
+          <div className="flex items-center gap-4">
+            <label className="font-medium text-gray-700">Members:</label>
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={decreaseMembers}
+                className="bg-gray-200 px-3 py-1 rounded-lg text-lg font-bold"
+              >
+                –
+              </button>
+              <span className="text-lg font-semibold w-8 text-center">
+                {formData.members}
+              </span>
+              <button
+                type="button"
+                onClick={increaseMembers}
+                className="bg-gray-200 px-3 py-1 rounded-lg text-lg font-bold"
+              >
+                +
+              </button>
+            </div>
           </div>
-          <div>
-            <label className="block text-gray-700 font-medium mb-2">
-              Destination
-            </label>
-            <select className="w-full border border-gray-300 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-blue-400">
-              <option>Select a destination</option>
-              <option>Paris, France</option>
-              <option>Bali, Indonesia</option>
-              <option>New York, USA</option>
-            </select>
-          </div>
-          <div>
-            <label className="block text-gray-700 font-medium mb-2">
-              Message (optional)
-            </label>
-            <textarea
-              placeholder="Tell us your preferences..."
-              className="w-full border border-gray-300 rounded-lg p-3 h-28 resize-none focus:outline-none focus:ring-2 focus:ring-blue-400"
-            ></textarea>
-          </div>
-          <div className="text-center">
-            <button
-              type="submit"
-              className="bg-blue-600 text-white px-8 py-3 rounded-full font-semibold hover:bg-blue-700 transition"
-            >
-              Submit Booking
-            </button>
-          </div>
+
+          {/* 💰 Total Cost */}
+          {formData.destination && (
+            <p className="text-lg text-center font-semibold text-gray-700">
+              Price per member: ₹{basePrice.toLocaleString()} <br />
+              Total Amount: ₹{totalAmount.toLocaleString()}
+            </p>
+          )}
+
+          {/* Travel Date */}
+          <input
+            type="date"
+            name="travelDate"
+            value={formData.travelDate}
+            onChange={handleChange}
+            required
+            className="w-full border border-gray-300 rounded-lg p-3"
+          />
+
+          {/* Phone */}
+          <input
+            type="tel"
+            name="phone"
+            placeholder="Phone Number"
+            value={formData.phone}
+            onChange={handleChange}
+            required
+            className="w-full border border-gray-300 rounded-lg p-3"
+          />
+
+          {/* Message */}
+          <textarea
+            name="message"
+            placeholder="Message (optional)"
+            value={formData.message}
+            onChange={handleChange}
+            className="w-full border border-gray-300 rounded-lg p-3 h-24"
+          ></textarea>
+
+          {/* Submit */}
+          <button
+            type="submit"
+            disabled={!otpVerified || loading}
+            className={`w-full py-3 rounded-lg font-semibold text-white transition ${
+              otpVerified
+                ? "bg-blue-600 hover:bg-blue-700"
+                : "bg-gray-400 cursor-not-allowed"
+            }`}
+          >
+            {loading ? "Processing..." : "Pay & Confirm Booking"}
+          </button>
         </form>
       </div>
     </section>
