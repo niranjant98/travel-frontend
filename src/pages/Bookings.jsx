@@ -21,14 +21,12 @@ const Bookings = () => {
     process.env.REACT_APP_BACKEND_URL || "http://localhost:5000";
   const razorpayKey = process.env.REACT_APP_RAZORPAY_KEY_ID;
 
-  // 💰 Destination Prices
   const destinationPrices = {
     Bali: 10000,
     Paris: 20000,
     "New York": 25000,
   };
 
-  // 🧮 Compute total dynamically
   const basePrice = destinationPrices[formData.destination] || 0;
   const totalAmount = basePrice * formData.members;
 
@@ -36,12 +34,10 @@ const Bookings = () => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  // ➕ Increase members
   const increaseMembers = () => {
     setFormData((prev) => ({ ...prev, members: prev.members + 1 }));
   };
 
-  // ➖ Decrease members (min 1)
   const decreaseMembers = () => {
     setFormData((prev) => ({
       ...prev,
@@ -49,7 +45,6 @@ const Bookings = () => {
     }));
   };
 
-  // ✅ Send OTP
   const sendOtp = async () => {
     if (!formData.email) return alert("Please enter your email first!");
     try {
@@ -68,7 +63,6 @@ const Bookings = () => {
     }
   };
 
-  // ✅ Verify OTP
   const verifyOtp = async () => {
     if (!otp) return alert("Enter the OTP sent to your email!");
     try {
@@ -88,14 +82,11 @@ const Bookings = () => {
     }
   };
 
-  // ✅ Payment Handler
   const handlePayment = async () => {
     try {
       setLoading(true);
+      const amount = totalAmount;
 
-      const amount = totalAmount; // total = basePrice × members
-
-      // 1️⃣ Create Razorpay order
       const { data } = await axios.post(`${backendURL}/api/payment/create-order`, {
         amount,
       });
@@ -107,10 +98,9 @@ const Bookings = () => {
 
       const { id: order_id, currency } = data.order;
 
-      // 2️⃣ Razorpay Payment Options
       const options = {
         key: razorpayKey,
-        amount: amount * 100, // Razorpay uses paise
+        amount: amount * 100,
         currency,
         name: "Charan Adventures",
         description: `Booking for ${formData.destination}`,
@@ -129,7 +119,6 @@ const Bookings = () => {
 
             alert("✅ Booking confirmed! Confirmation email sent.");
 
-            // Reset form
             setFormData({
               name: "",
               email: "",
@@ -152,20 +141,15 @@ const Bookings = () => {
           email: formData.email,
           contact: formData.phone,
         },
-        theme: {
-          color: "#2563eb",
-        },
+        theme: { color: "#2563eb" },
         modal: {
-          ondismiss: () => {
-            alert("Payment cancelled.");
-          },
+          ondismiss: () => alert("Payment cancelled."),
         },
       };
 
       const razor = new window.Razorpay(options);
       razor.open();
 
-      // Payment failure
       razor.on("payment.failed", function (response) {
         alert("❌ Payment failed. Please try again.");
         console.error(response.error);
@@ -178,7 +162,6 @@ const Bookings = () => {
     }
   };
 
-  // ✅ Submit Form
   const handleSubmit = (e) => {
     e.preventDefault();
     if (!otpVerified) {
@@ -193,18 +176,18 @@ const Bookings = () => {
   };
 
   return (
-    <section className="bg-blue-50 py-16 px-6 md:px-20">
+    <section className="bg-blue-50 py-16 px-4 sm:px-8 md:px-20">
       <div className="text-center mb-12">
-        <h1 className="text-4xl md:text-5xl font-extrabold text-blue-700">
+        <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-blue-700">
           Book Your Dream Adventure 🌍
         </h1>
-        <p className="text-gray-600 mt-3 text-lg max-w-2xl mx-auto">
+        <p className="text-gray-600 mt-3 text-base sm:text-lg max-w-2xl mx-auto">
           Explore amazing destinations with Charan Adventures. Start your journey now!
         </p>
       </div>
 
-      <div className="max-w-3xl mx-auto bg-white shadow-md rounded-2xl p-8 md:p-12">
-        <h2 className="text-3xl font-bold text-blue-700 mb-6 text-center">
+      <div className="max-w-3xl mx-auto bg-white shadow-lg rounded-2xl p-6 sm:p-10 md:p-12">
+        <h2 className="text-2xl sm:text-3xl font-bold text-blue-700 mb-6 text-center">
           Booking Form 🧾
         </h2>
 
@@ -217,12 +200,12 @@ const Bookings = () => {
             value={formData.name}
             onChange={handleChange}
             required
-            className="w-full border border-gray-300 rounded-lg p-3"
+            className="w-full border border-gray-300 rounded-lg p-3 text-sm sm:text-base"
           />
 
-          {/* Email + OTP */}
-          <div>
-            <div className="flex gap-3">
+          {/* Email + OTP Section */}
+          <div className="space-y-3">
+            <div className="flex flex-col sm:flex-row gap-3">
               <input
                 type="email"
                 name="email"
@@ -230,30 +213,30 @@ const Bookings = () => {
                 value={formData.email}
                 onChange={handleChange}
                 required
-                className="flex-1 border border-gray-300 rounded-lg p-3"
+                className="flex-1 border border-gray-300 rounded-lg p-3 text-sm sm:text-base"
               />
               <button
                 type="button"
                 onClick={sendOtp}
-                className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
+                className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 text-sm sm:text-base w-full sm:w-auto"
               >
                 Send OTP
               </button>
             </div>
 
             {otpSent && !otpVerified && (
-              <div className="flex gap-3 mt-3">
+              <div className="flex flex-col sm:flex-row gap-3">
                 <input
                   type="text"
                   placeholder="Enter OTP"
                   value={otp}
                   onChange={(e) => setOtp(e.target.value)}
-                  className="flex-1 border border-gray-300 rounded-lg p-3"
+                  className="flex-1 border border-gray-300 rounded-lg p-3 text-sm sm:text-base"
                 />
                 <button
                   type="button"
                   onClick={verifyOtp}
-                  className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700"
+                  className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 text-sm sm:text-base w-full sm:w-auto"
                 >
                   Verify
                 </button>
@@ -261,7 +244,9 @@ const Bookings = () => {
             )}
 
             {otpVerified && (
-              <p className="text-green-600 mt-2 font-semibold">✅ Email Verified!</p>
+              <p className="text-green-600 mt-2 font-semibold text-sm sm:text-base">
+                ✅ Email Verified!
+              </p>
             )}
           </div>
 
@@ -271,7 +256,7 @@ const Bookings = () => {
             value={formData.destination}
             onChange={handleChange}
             required
-            className="w-full border border-gray-300 rounded-lg p-3"
+            className="w-full border border-gray-300 rounded-lg p-3 text-sm sm:text-base"
           >
             <option value="">Select Destination</option>
             <option>Bali</option>
@@ -280,8 +265,10 @@ const Bookings = () => {
           </select>
 
           {/* Members with + and - buttons */}
-          <div className="flex items-center gap-4">
-            <label className="font-medium text-gray-700">Members:</label>
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <label className="font-medium text-gray-700 text-sm sm:text-base">
+              Members:
+            </label>
             <div className="flex items-center gap-2">
               <button
                 type="button"
@@ -303,23 +290,25 @@ const Bookings = () => {
             </div>
           </div>
 
-          {/* 💰 Total Cost */}
+          {/* Total Cost */}
           {formData.destination && (
-            <p className="text-lg text-center font-semibold text-gray-700">
+            <p className="text-base sm:text-lg text-center font-semibold text-gray-700">
               Price per member: ₹{basePrice.toLocaleString()} <br />
               Total Amount: ₹{totalAmount.toLocaleString()}
             </p>
           )}
 
           {/* Travel Date */}
-          <input
-            type="date"
-            name="travelDate"
-            value={formData.travelDate}
-            onChange={handleChange}
-            required
-            className="w-full border border-gray-300 rounded-lg p-3"
-          />
+          <div className="w-full">
+            <input
+              type="date"
+              name="travelDate"
+              value={formData.travelDate}
+              onChange={handleChange}
+              required
+              className="w-full border border-gray-300 rounded-lg p-3 text-sm sm:text-base"
+            />
+          </div>
 
           {/* Phone */}
           <input
@@ -329,7 +318,7 @@ const Bookings = () => {
             value={formData.phone}
             onChange={handleChange}
             required
-            className="w-full border border-gray-300 rounded-lg p-3"
+            className="w-full border border-gray-300 rounded-lg p-3 text-sm sm:text-base"
           />
 
           {/* Message */}
@@ -338,14 +327,14 @@ const Bookings = () => {
             placeholder="Message (optional)"
             value={formData.message}
             onChange={handleChange}
-            className="w-full border border-gray-300 rounded-lg p-3 h-24"
+            className="w-full border border-gray-300 rounded-lg p-3 h-24 text-sm sm:text-base"
           ></textarea>
 
           {/* Submit */}
           <button
             type="submit"
             disabled={!otpVerified || loading}
-            className={`w-full py-3 rounded-lg font-semibold text-white transition ${
+            className={`w-full py-3 rounded-lg font-semibold text-white transition text-sm sm:text-base ${
               otpVerified
                 ? "bg-blue-600 hover:bg-blue-700"
                 : "bg-gray-400 cursor-not-allowed"
