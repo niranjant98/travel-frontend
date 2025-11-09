@@ -232,9 +232,9 @@ const trips = {
       "Enjoy off-the-beaten-path trekking with fewer crowds.",
     ],
     itinerary: [
-      { title: "Day 1: Arrival in Kathmandu (1400m)", desc: "Arrive in Kathmandu, meet your guide, and transfer to hotel." },
-      { title: "Day 2: Briefing & Permit Preparation", desc: "Meet your trek leader, finalize trekking permits, and rest." },
-      { title: "Day 3: Drive to Machha Khola (890m)", desc: "A 9-hour scenic drive through hills and villages alongside Trishuli River." },
+      { title: "Day 1: Arrival in Kathmandu (1400m)", desc: "At Kathmandu airport's arrival terminal, a representative from Green Valley Nepal will be waiting for you. The agent will greet you and take you to your Kathmandu hotel. You can either take a rest or meet us at our office and know the detail about Manaslu Circuit Trek Itinerary." },
+      { title: "Day 2: Briefing & Permit Preparation", desc: "The hike leader/guide will meet you at the hotel after breakfast. The purpose of this pre-trip meeting is to provide a Manaslu Circuit Trek overview and other important information. Please bring a copy of your travel insurance policy as well as your passport and three passport-sized photos. You may utilize your free time to relax or go shopping for last-minute items." },
+      { title: "Day 3: Drive to Machha Khola (890m)", desc: "You will board a public bus to Machha Khola after breakfast in Kathmandu, passing through Arughat and Soti Khola to officially begin your Manaslu Circuit Trekking Itinerary. It will be a lengthy journey, with the first part of the journey being smooth over a blacktop major roadway to Arughat, and the second half of the journey being challenging from Arughat. As you go over the rocky road to Maccha Khola, be ready to bounce your body with some actions. The trip, on the other hand, will provide some spectacular views of Nepal's landscapes." },
       { title: "Day 4: Trek to Jagat (1340m)", desc: "Trek along Budhi Gandaki River, cross bridges, and reach Jagat village." },
       { title: "Day 5: Trek to Deng (1860m)", desc: "Pass lush forests and riverside trails with Himalayan views." },
       { title: "Day 6: Trek to Namrung (2630m)", desc: "Ascend through forests and villages to Namrung for mountain vistas." },
