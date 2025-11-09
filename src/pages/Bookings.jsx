@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { useLocation } from "react-router-dom";
 import axios from "axios";
 
 const Bookings = () => {
@@ -21,10 +22,27 @@ const Bookings = () => {
     process.env.REACT_APP_BACKEND_URL || "http://localhost:5000";
   const razorpayKey = process.env.REACT_APP_RAZORPAY_KEY_ID;
 
+  const location = useLocation();
+
+  // ✅ Prefill destination from query parameter
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const destinationFromURL = params.get("destination");
+    if (destinationFromURL) {
+      setFormData((prev) => ({
+        ...prev,
+        destination: destinationFromURL,
+      }));
+    }
+  }, [location]);
+
   const destinationPrices = {
     Bali: 10000,
     Paris: 20000,
     "New York": 25000,
+    "Kathmandu Adventure": 12000,
+    "Nepal Hills Expedition": 45000,
+    "Manaslu Circuit Trek": 150000,
   };
 
   const basePrice = destinationPrices[formData.destination] || 0;
@@ -176,8 +194,8 @@ const Bookings = () => {
   };
 
   return (
-    <section className="bg-blue-50 py-16 px-4 sm:px-8 md:px-20">
-      <div className="text-center mb-12">
+    <section className="bg-blue-50 py-10 sm:py-16 px-4 sm:px-8 md:px-20 min-h-screen">
+      <div className="text-center mb-10 sm:mb-12">
         <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-blue-700">
           Book Your Dream Adventure 🌍
         </h1>
@@ -259,9 +277,12 @@ const Bookings = () => {
             className="w-full border border-gray-300 rounded-lg p-3 text-sm sm:text-base"
           >
             <option value="">Select Destination</option>
-            <option>Bali</option>
-            <option>Paris</option>
-            <option>New York</option>
+            <option value="Bali">Bali</option>
+            <option value="Paris">Paris</option>
+            <option value="New York">New York</option>
+            <option value="Kathmandu Adventure">Kathmandu Adventure</option>
+            <option value="Nepal Hills Expedition">Nepal Hills Expedition</option>
+            <option value="Manaslu Circuit Trek">Manaslu Circuit Trek</option>
           </select>
 
           {/* Members with + and - buttons */}
@@ -298,28 +319,27 @@ const Bookings = () => {
             </p>
           )}
 
-         {/* Travel Date */}
-<div className="w-full">
-  <label className="block text-gray-700 font-medium mb-2 text-sm sm:text-base">
-    Travel Date:
-  </label>
-  <input
-    type="date"
-    name="travelDate"
-    value={formData.travelDate}
-    onChange={handleChange}
-    required
-    className="w-full border border-gray-300 rounded-lg px-3 py-3 text-sm sm:text-base appearance-none focus:ring-2 focus:ring-blue-500 focus:outline-none"
-    style={{
-      WebkitAppearance: "none",
-      MozAppearance: "none",
-      appearance: "none",
-      backgroundColor: "#fff",
-      colorScheme: "light",
-    }}
-  />
-</div>
-
+          {/* Travel Date */}
+          <div className="w-full">
+            <label className="block text-gray-700 font-medium mb-2 text-sm sm:text-base">
+              Travel Date:
+            </label>
+            <input
+              type="date"
+              name="travelDate"
+              value={formData.travelDate}
+              onChange={handleChange}
+              required
+              className="w-full border border-gray-300 rounded-lg px-3 py-3 text-sm sm:text-base appearance-none focus:ring-2 focus:ring-blue-500 focus:outline-none"
+              style={{
+                WebkitAppearance: "none",
+                MozAppearance: "none",
+                appearance: "none",
+                backgroundColor: "#fff",
+                colorScheme: "light",
+              }}
+            />
+          </div>
 
           {/* Phone */}
           <input
